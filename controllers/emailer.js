@@ -65,15 +65,14 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
     console.log("hello")
     let emailList;
     let emailArray=[];
+    let emailcount;
      if(req.body.type==="9"){
           emailList = await emailer.find();
      }else{
          emailList = await emailer.find({golf:req.body.type});
      }
      const file = req.files.file;
-   emailList.forEach(function(x){
-    emailArray.push(x.email);
-   })
+    
      //checking if image is uploaded
      if(!file){
          return next(new ErrorResponse('Please Upload file',400));
@@ -95,46 +94,69 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
             return next(new ErrorResponse(`Problem with file Upload`,500))
         }else{
           
-        var path = `${process.env.PWD}/public/uploads/${file.name}`
-            var sender = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.USER,
-                    pass: process.env.PASS
-                }
-            });
-            
-            var mail = {
-                from: "RAJ KUNWAR SINGH",
-                to:emailArray,
-                subject: 'Sending Email using Node.js',
-                text: 'That was easy!',
-            html:
-            "<h1>Sent through Emailer</h1><p>Testing is done</p>",
-            attachments: [
-                    {
-                        filename: file.name,
-                        path:path,
-                        // cid: 'uniq-mailtrap.png'
-                    }
-                ],
-                pool:true,
-                maxConnections:500,
-                maxMessage:500
-            };
-            console.log(path)
-            sender.sendMail(mail, function (error, info) {
-                if (error) {
-                    console.log(error);
-                    res.status(500).send("There was error sending email")
-                } else {
-                    console.log('Email sent successfully: '
-                            + info.response);
-                            res.render("thank")
-                }
-            });
-            
-                sender.close();
+        var path = `${process.env.PWD}/public/uploads/${file.name}`;
+         function sender(user,password,sendingList){
+              var sender = nodemailer.createTransport({
+                  service: 'gmail',
+                  auth: {
+                      user: user,
+                      pass: password
+                  }
+              });
+              
+              var mail = {
+                  from: "RAJ KUNWAR SINGH",
+                  to:sendingList,
+                  subject: 'Sending Email using Node.js',
+                  text: 'That was easy!',
+              html:
+              "<h1>Sent through Emailer</h1><p>Testing is done</p>",
+              attachments: [
+                      {
+                          filename: file.name,
+                          path:path,
+                          // cid: 'uniq-mailtrap.png'
+                      }
+                  ],
+                  pool:true,
+                  maxConnections:500,
+                  maxMessage:1000
+              };
+          
+              sender.sendMail(mail, function (error, info) {
+                  if (error) {
+                      console.log(error);
+                      
+                  } else {
+                      console.log('Email sent successfully: '
+                              + info.response);
+                              res.render("thank")
+                  }
+              });
+              
+                  sender.close();
+         }
+        emailcount=emailList.length;
+        if(count<=500){
+      emailList.forEach(function(x){
+       emailArray.push(x.email);
+      })
+      await sender(process.env.USER,process.env.PASS,emailArray);
+        }else{
+            let newArray;
+            let secondArray;
+            emailArray = emailList.slice(0,500);
+            let maxArray = emaiList.slice(500,500);
+            emailArray.forEach(function(x){
+                newArray.push(x.email);
+               })
+            maxArray.forEach(function(x){
+                secondArray.push(x.email);
+               })
+               await sender(process.env.USER,process.env.USEME,newArray);
+               await sender(process.env.USER,process.env.PASME,newArray);
+
+        }
                 
 
         }
