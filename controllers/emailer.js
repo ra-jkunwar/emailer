@@ -145,8 +145,8 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
      });
 
 exports.newEmailpage=asyncHandler(async (req,res,next)=>{
-    console.log('Hello')
-    res.render('newUser');
+   
+    res.render('newUSer');
 })
 
 // @desc delete particular email/All the email
