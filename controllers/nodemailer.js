@@ -29,7 +29,7 @@ exports.sender=(user,password,sendingList,file,path)=>{
         maxConnections:500,
         maxMessage:1000
     };
-
+    let m ;
     sender.sendMail(mail, function (error, info) {
         if (error) {
             console.log(error);
@@ -37,10 +37,15 @@ exports.sender=(user,password,sendingList,file,path)=>{
         } else {
             console.log('Email sent successfully: '
                     + info.response);
+                m = 1;
+
+
                    
         }
     });
     
         sender.close();
+
+        return 1;
 }
 
