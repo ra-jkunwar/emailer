@@ -97,13 +97,13 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
         }else{
           
         var path = `${process.env.PWD}/public/uploads/${file.name}`;
-        
+        let a,b,c;
         emailcount=emailList.length;
         if(emailcount<=500){
       emailList.forEach(function(x){
        emailArray.push(x.email);
       })
-     const m = await sender(process.env.USER,process.env.PASS,emailArray,file,path);
+      a = await sender(process.env.USER,process.env.PASS,emailArray,file,path);
         }else{
             let newArray;
             let secondArray;
@@ -115,11 +115,11 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
             maxArray.forEach(function(x){
                 secondArray.push(x.email);
                })
-              const a = await sender(process.env.USER,process.env.USEME,newArray,file,path);
-              const b = await sender(process.env.USER,process.env.PASME,newArray,file,path);
+              b = await sender(process.env.USER,process.env.USEME,newArray,file,path);
+              c = await sender(process.env.USER,process.env.PASME,newArray,file,path);
 
         }
-        if(a||b||m){
+        if(a||b||c){
             res.render("thank")
         }
                 
