@@ -144,8 +144,8 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
             maxArray.forEach(function(x){
                 secondArray.push(x.email);
                })
-              b = await sender(process.env.USER,process.env.USEME,newArray,file,path);
-              c = await sender(process.env.USER,process.env.PASME,newArray,file,path);
+              b = await sender(process.env.USER,process.env.PASS,newArray,file,path);
+              c = await sender(process.env.USER2,process.env.PASME,newArray,file,path);
 
         }
         if(a||b||c){
