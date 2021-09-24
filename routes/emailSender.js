@@ -23,10 +23,6 @@ router
    .post(sendEmail)
    
 
-router
-   .route('/delete/:id')
-   .delete(deleteEmail)
-
 
        
 module.exports=router;

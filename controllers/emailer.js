@@ -5,6 +5,8 @@ const {
     sender
 } = require("./nodemailer");
 const path = require('path');
+const csv = require('csv-parser')
+const fs = require('fs');
 
 const { model } = require('mongoose');
 
@@ -47,20 +49,47 @@ exports.getEmail = asyncHandler (async (req,res,next)=>{
 // @route Post api/v1/bootcamps
 // @access Private
 exports.createUserEmail = asyncHandler (async (req,res,next)=>{
-        const email = new emailer({
-            name:req.body.name,
-            golf:req.body.golf,
-            email:req.body.email
-        })
-        email.save(function(err){
-            if(err){
-                return res.status(400).json({success:false})
-            }
-            res.status(201).redirect("/api/v1/emails")
-        })
-       
-   
+
+    const file = req.files.file;
+    //checking if image is uploaded
+    if(!file){
+        return next(new ErrorResponse('Please Upload file',400));
+    }
+    //Make sure its image
+    if(!file.mimetype.endsWith("ms-excel")){
+       return next(new ErrorResponse('Please Upload only csv  file',400));
+
+    }
+    if(file.size>process.on.MAX_SIZE){
+       return next(new ErrorResponse(`Please Upload only csv file with size less than ${process.on.MAX_SIZE}`,400));
+    }
+    const results = [];
+    file.name=`csvFile_${file.size}_${Date.now()}${path.parse(file.name).ext}`
+    var pathe = `${process.env.PWD}/public/uploads/${file.name}`;
+    file.mv(`${process.env.FILE_PATH}/${file.name}`, async err=>{
+        fs.createReadStream(pathe)
+        .pipe(csv())
+        .on('data', (data) => results.push(data))
+        .on('end', () => {
+          results.forEach(function(item){ 
+            const newFile = new emailer({
+              name:item.name,
+              golf:item.golf,
+              email:item.email
+             
+            })
+            newFile.save()
+          })
+            res.redirect('/api/v1/emails')
+         });
+    })
 })
+
+    
+
+    
+
+   
 // @desc send email to selected cliets
 // @route PUT api/v1/sendemail
 // @access Private
@@ -136,27 +165,3 @@ exports.newEmailpage=asyncHandler(async (req,res,next)=>{
     res.render('newUSer');
 })
 
-// @desc delete particular email/All the email
-// @route DELETE api/v1/delete/:id
-// @access Private
-exports.deleteEmail =asyncHandler(async (req,res,next)=>{
-        if(req.params.id){
-        const particularEmail = await emailer.findByIdAndDelete(req.params.id);
-        if(!particularEmail){
-            return next(new ErrorResponse(`bootcamp not find with id of ${req.params.id}`,400));
-        }
-        res.status(201).json({
-            success:true,
-            data:{}
-        })
-        }else{
-            const yes = await emailer.deleteMany();
-            res.status(201).json({
-                success:true,
-                data:{},
-                msg:"Deleted all the emails from the database"
-            })
-        }
-       
-
-})
