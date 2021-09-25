@@ -16,7 +16,7 @@ const { model } = require('mongoose');
 // @route GET api/v1/emails
 // @access Public
 exports.getEmails = asyncHandler ( async (req,res,next)=>{
-    res.render('newUser');
+    res.render('newUSer');
     
 });
 // @desc Get particular bootcamps
