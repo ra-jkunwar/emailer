@@ -115,6 +115,7 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
       emailList.forEach(function(x){
        emailArray.push(x.email);
       })
+      
       a = await sender(process.env.USER,process.env.PASS,emailArray,fil,paths,req.body.subject,req.body.post);
         }else{
             let newArray;
@@ -127,7 +128,8 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
             maxArray.forEach(function(x){
                 secondArray.push(x.email);
                })
-              b = await sender(process.env.USER,process.env.PASS,newArray,fil,paths,req.body.subject,req.body.post);
+               console.log(req.body.post)
+           b = await sender(process.env.USER,process.env.PASS,newArray,fil,paths,req.body.subject,req.body.post);
               c = await sender(process.env.USER2,process.env.PASME,newArray,fil,paths,req.body.subject,req.body.post);
 
         }

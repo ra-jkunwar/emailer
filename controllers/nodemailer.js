@@ -4,6 +4,7 @@ const ErrorResponse = require('../utils/errorResponse');
 
 
 exports.sender=(user,password,sendingList,file,path,subject,content)=>{
+
     var sender = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -16,9 +17,8 @@ exports.sender=(user,password,sendingList,file,path,subject,content)=>{
         from: "RAJ KUNWAR SINGH",
         to:sendingList,
         subject: subject,
-        text: content,
     html:
-    "<h1>Sent through Emailer</h1><p>Testing is done</p>",
+    `<h1>${content}<br>Sent through Emailer</h1><p>Testing is done</p>`,
     attachments: [
             {
                 filename: file.name,
