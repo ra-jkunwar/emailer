@@ -1,12 +1,6 @@
 const mongoose = require('mongoose');
 
 const emailSchema = new mongoose.Schema({
-    name:{
-        type:String,
-        required:[true,"Name is required"],
-        maxlength:[30,"Max name length is 30"],
-        minlength:[3,"Name could not be less than 3 characters"]
-    },
     email:{
         type:String,
         match:[

@@ -1,8 +1,9 @@
 const express = require('express');
-const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer');
+const ErrorResponse = require('../utils/errorResponse');
 
 
-exports.sender=(user,password,sendingList,file,path)=>{
+exports.sender=(user,password,sendingList,file,path,subject,content)=>{
     var sender = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -14,8 +15,8 @@ exports.sender=(user,password,sendingList,file,path)=>{
     var mail = {
         from: "RAJ KUNWAR SINGH",
         to:sendingList,
-        subject: 'Sending Email using Node.js',
-        text: 'That was easy!',
+        subject: subject,
+        text: content,
     html:
     "<h1>Sent through Emailer</h1><p>Testing is done</p>",
     attachments: [
@@ -33,7 +34,7 @@ exports.sender=(user,password,sendingList,file,path)=>{
     sender.sendMail(mail, function (error, info) {
         if (error) {
             console.log(error);
-            
+            return new ErrorResponse(`${error.message},400`)
         } else {
             console.log('Email sent successfully: '
                     + info.response);

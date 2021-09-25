@@ -7,7 +7,8 @@ const {
     deleteEmail,
     createUserEmail,
     sendEmail,
-    newEmailpage
+    emailviewa,
+    emailview
 } = require('../controllers/emailer')
 
 
@@ -15,13 +16,14 @@ const {
 router
    .route('/')
    .get(getEmails)
+   .post(createUserEmail)
 router
    .route('/:golf')
    .get(getEmail)
 router
    .route('/sendemail')
    .post(sendEmail)
-   
+   .get(getEmail)
 
 
        
