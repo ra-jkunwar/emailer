@@ -47,7 +47,7 @@ exports.createUserEmail = asyncHandler (async (req,res,next)=>{
     }
     const results = [];
     file.name=`csvFile_${file.size}_${Date.now()}${path.parse(file.name).ext}`
-    var pathe = `${process.env.PWD}/public/uploads/${file.name}`;
+    var pathe = `./public/uploads/${file.name}`;
     file.mv(`${process.env.FILE_PATH}/${file.name}`, async err=>{
         fs.createReadStream(pathe)
         .pipe(csv())
