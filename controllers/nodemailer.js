@@ -14,8 +14,8 @@ exports.sender=(user,password,sendingList,file,path,subject,content)=>{
     });
     
     var mail = {
-        from: "RAJ KUNWAR SINGH",
-        to:sendingList,
+        from: `"RAJ KUNWAR SINGH " ${process.env.USER}`,
+        bcc:sendingList,
         subject: subject,
     html:
     `<h1>${content}<br><br>Sent through Emailer</h1><p>Testing is done</p><br><img src="cid:uniq-mailInline" alt="inline_image"/>`,
