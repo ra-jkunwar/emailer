@@ -18,19 +18,19 @@ exports.sender=(user,password,sendingList,file,path,subject,content)=>{
         to:sendingList,
         subject: subject,
     html:
-    `<h1>${content}<br>Sent through Emailer</h1><p>Testing is done</p>`,
+    `<h1>${content}<br><br>Sent through Emailer</h1><p>Testing is done</p><br><img src="cid:uniq-mailInline" alt="inline_image"/>`,
     attachments: [
             {
                 filename: file.name,
-                path:path
-                // cid: `uniq-gmail${file.name}.png`
+                path:path,
+                cid: `uniq-mailInline`
             }
         ],
         pool:true,
         maxConnections:500,
         maxMessage:1000
     };
-    let m ;
+    let m = 0 ;
     sender.sendMail(mail, function (error, info) {
         if (error) {
             console.log(error);
