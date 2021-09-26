@@ -83,10 +83,8 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
      }else{
          emailList = await emailer.find({golf:false})
      }
-     console.log(emailList)
      const fil = req.files.fileimg;
      emailcount=emailList.length
-    console.log(emailList,emailcount)
      //checking if image is uploaded
      if(!fil){
          return next(new ErrorResponse('Please Upload image',400));
@@ -108,7 +106,7 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
             return next(new ErrorResponse(`Problem with file Upload`,500))
         }else{
           
-        var paths = `${process.env.PWD}/public/uploads/${fil.name}`;
+        var paths = `./public/uploads/${fil.name}`;
         let a,b,c;
        
         if(emailcount<=500){
@@ -116,10 +114,10 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
        emailArray.push(x.email);
       })
     
-    //   a = await sender(process.env.USER,process.env.PASS,emailArray,fil,paths,req.body.subject,req.body.post);
+      a = await sender(process.env.USER,process.env.PASS,emailArray,fil,paths,req.body.subject,req.body.post);
         }else{
-            let newArray;
-            let secondArray;
+            let newArray=[];
+            let secondArray=[];
             emailArray = emailList.slice(0,500);
             let maxArray = emailList.slice(500,emailcount);
             emailArray.forEach(function(x){
@@ -129,8 +127,8 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
                 secondArray.push(x.email);
                })
             //    console.log("else m hu")
-        //    b = await sender(process.env.USER,process.env.PASS,newArray,fil,paths,req.body.subject,req.body.post);
-        //       c = await sender(process.env.USER2,process.env.PASME,newArray,fil,paths,req.body.subject,req.body.post);
+           b = await sender(process.env.USER,process.env.PASS,newArray,fil,paths,req.body.subject,req.body.post);
+              c = await sender(process.env.USER2,process.env.PASME,newArray,fil,paths,req.body.subject,req.body.post);
 
         }
         if(a||b||c){

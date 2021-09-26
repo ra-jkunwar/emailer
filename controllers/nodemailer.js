@@ -18,12 +18,12 @@ exports.sender=(user,password,sendingList,file,path,subject,content)=>{
         to:sendingList,
         subject: subject,
     html:
-    `<h1>${content}<br>Sent through Emailer</h1><p>Testing is done</p>`,
+    `<h1>${content}<br>Sent through Emailer</h1><p>Testing is done</p>Embedded image: <img src="uniq-gmail${file.name}.png"/>`,
     attachments: [
             {
                 filename: file.name,
                 path:path,
-                // cid: 'uniq-mailtrap.png'
+                cid: `uniq-gmail${file.name}.png`
             }
         ],
         pool:true,
