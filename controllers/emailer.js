@@ -7,7 +7,7 @@ const {
 const path = require('path');
 const csv = require('csv-parser')
 const fs = require('fs');
-
+const md5 = require("md5")
 const { model } = require('mongoose');
 
 
@@ -16,33 +16,15 @@ const { model } = require('mongoose');
 // @route GET api/v1/emails
 // @access Public
 exports.getEmails = asyncHandler ( async (req,res,next)=>{
-        const emails = await emailer.find();
-        if(!emails){
-            return res.status(400).json({success:false});
-        }
-        // res.status(200).json({
-        //     success:true,
-        //     count:emails.length,
-        //     data:emails
-        // })
-    res.render('index',{data:emails});
+    res.render('newUSer');
+    
 });
 // @desc Get particular bootcamps
 // @route GET api/v1/emails/:golf/
 // @access Public
 exports.getEmail = asyncHandler (async (req,res,next)=>{
-
-    if(req.params.golf){
-        query= emailer.find({golf:true});
-    }else{
-        query= emailer.find({golf:false});
-    }
-
-    const emails = await query;
-        res.status(201).json({
-            success:true,
-            data:emails
-        })
+    res.render('index');
+ 
     
 })
 // @desc add new email in database
@@ -56,8 +38,8 @@ exports.createUserEmail = asyncHandler (async (req,res,next)=>{
         return next(new ErrorResponse('Please Upload file',400));
     }
     //Make sure its image
-    if(!file.mimetype.endsWith("ms-excel")){
-       return next(new ErrorResponse('Please Upload only csv  file',400));
+    if(!file.name.endsWith("csv")){
+       return next(new ErrorResponse('Please Upload only csv file',400));
 
     }
     if(file.size>process.on.MAX_SIZE){
@@ -65,7 +47,7 @@ exports.createUserEmail = asyncHandler (async (req,res,next)=>{
     }
     const results = [];
     file.name=`csvFile_${file.size}_${Date.now()}${path.parse(file.name).ext}`
-    var pathe = `${process.env.PWD}/public/uploads/${file.name}`;
+    var pathe = `./public/uploads/${file.name}`;
     file.mv(`${process.env.FILE_PATH}/${file.name}`, async err=>{
         fs.createReadStream(pathe)
         .pipe(csv())
@@ -73,83 +55,90 @@ exports.createUserEmail = asyncHandler (async (req,res,next)=>{
         .on('end', () => {
           results.forEach(function(item){ 
             const newFile = new emailer({
-              name:item.name,
-              golf:item.golf,
-              email:item.email
+             isGolfie:item.golf,
+              email:item.email,
+              uid: md5(item.email)
              
             })
             newFile.save()
           })
-            res.redirect('/api/v1/emails')
+            res.redirect('/api/v1/emails/sendemail')
          });
     })
 })
 
-    
 
-    
-
-   
 // @desc send email to selected cliets
 // @route PUT api/v1/sendemail
 // @access Private
 exports.sendEmail = asyncHandler (async (req,res,next)=>{
+    // await emailer.deleteMany();
+  
     let emailList;
     let emailArray=[];
     let emailcount;
-     if(req.body.type==="9"){
-          emailList = await emailer.find();
+     if(req.body.type.startsWith("A")){
+      emailList = await emailer.find()
+     }else if(req.body.type.startsWith("O")){
+        emailList = await emailer.find({isGolfie:true})
      }else{
-         emailList = await emailer.find({golf:req.body.type});
+         emailList = await emailer.find({isGolfie:false})
      }
-     const file = req.files.file;
-    
+     const fil = req.files.fileimg;
+     emailcount=emailList.length
      //checking if image is uploaded
-     if(!file){
-         return next(new ErrorResponse('Please Upload file',400));
+     if(!fil){
+         return next(new ErrorResponse('Please Upload image',400));
      }
      //Make sure its image
-     if(!file.mimetype.startsWith("image")){
+     if(!fil.mimetype.startsWith("image")){
         return next(new ErrorResponse('Please Upload only image  file',400));
 
      }
-     if(file.size>process.on.MAX_SIZE){
-        return next(new ErrorResponse(`Please Upload only image file with size less than ${process.on.MAX_SIZE}`,400));
+     if(fil.size>process.on.MAX_SIZE){
+        return next(new ErrorResponse(  `Please Upload only image file with size less than ${process.on.MAX_SIZE}`,400));
      }
-     file.name=`image_${file.size}_${Date.now()}${path.parse(file.name).ext}`
+     fil.name=`image_${fil.size}_${Date.now()}${path.parse(fil.name).ext}`
      
-     file.mv(`${process.env.FILE_PATH}/${file.name}`, async err=>{
+     fil.mv(`${process.env.FILE_PATH}/${fil.name}`, async err=>{
 
         if(err){
             console.log(err);
             return next(new ErrorResponse(`Problem with file Upload`,500))
         }else{
           
-        var path = `${process.env.PWD}/public/uploads/${file.name}`;
+        var paths = `./public/uploads/${fil.name}`;
         let a,b,c;
-        emailcount=emailList.length;
+        let yu = req.body.post
+       const content = yu.replace(/\r/g, '\n')
         if(emailcount<=500){
       emailList.forEach(function(x){
        emailArray.push(x.email);
       })
-      a = await sender(process.env.USER,process.env.PASS,emailArray,file,path);
-        }else{
-            let newArray;
-            let secondArray;
+    console.log(content);
+    a = await sender(process.env.USER,process.env.PASS,emailArray,fil,paths,req.body.subject,content);
+   
+}else{
+            let newArray=[];
+            let secondArray=[];
             emailArray = emailList.slice(0,500);
-            let maxArray = emaiList.slice(500,emailcount);
+            let maxArray = emailList.slice(500,emailcount);
             emailArray.forEach(function(x){
                 newArray.push(x.email);
                })
             maxArray.forEach(function(x){
                 secondArray.push(x.email);
                })
-              b = await sender(process.env.USER,process.env.USEME,newArray,file,path);
-              c = await sender(process.env.USER,process.env.PASME,newArray,file,path);
+
+               
+            //    console.log("else m hu")
+        //    b = await sender(process.env.USER,process.env.PASS,newArray,fil,paths,req.body.subject,req.body.post);
+            //   c = await sender(process.env.USER2,process.env.PASME,newArray,fil,paths,req.body.subject,req.body.post);
 
         }
         if(a||b||c){
-            res.render("thank")
+           await emailer.deleteMany();
+            res.render("thank");
         }
                 
 

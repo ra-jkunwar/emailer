@@ -13,7 +13,7 @@ const port = process.env.PORT||3000;
 //creating app instance
 const app = express();
 app.set("view engine","ejs")
-app.use(express.static(path.join(__dirname,'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 
 

@@ -1,8 +1,10 @@
 const express = require('express');
-const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer');
+const ErrorResponse = require('../utils/errorResponse');
 
 
-exports.sender=(user,password,sendingList,file,path)=>{
+exports.sender=(user,password,sendingList,file,path,subject,content)=>{
+
     var sender = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -12,28 +14,27 @@ exports.sender=(user,password,sendingList,file,path)=>{
     });
     
     var mail = {
-        from: "RAJ KUNWAR SINGH",
-        to:sendingList,
-        subject: 'Sending Email using Node.js',
-        text: 'That was easy!',
+        from: `"RAJ KUNWAR SINGH " ${process.env.USER}`,
+        bcc:sendingList,
+        subject: subject,
     html:
-    "<h1>Sent through Emailer</h1><p>Testing is done</p>",
+    `${content}<br><br><img src="cid:uniq-mailInline" alt="inline_image"/>`,
     attachments: [
             {
                 filename: file.name,
                 path:path,
-                // cid: 'uniq-mailtrap.png'
+                cid: `uniq-mailInline`
             }
         ],
         pool:true,
         maxConnections:500,
         maxMessage:1000
     };
-    let m ;
+    let m = 0 ;
     sender.sendMail(mail, function (error, info) {
         if (error) {
             console.log(error);
-            
+            return new ErrorResponse(`${error.message},400`)
         } else {
             console.log('Email sent successfully: '
                     + info.response);

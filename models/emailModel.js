@@ -1,11 +1,24 @@
 const mongoose = require('mongoose');
 
 const emailSchema = new mongoose.Schema({
-    name:{
+    typeof : {
         type:String,
-        required:[true,"Name is required"],
-        maxlength:[30,"Max name length is 30"],
-        minlength:[3,"Name could not be less than 3 characters"]
+        default:"user"
+    },
+    isblocked : {
+        type:Boolean,
+        default:false
+    },
+    bookings : Array,
+    dailyBookingDone : {
+        type:Boolean,
+        default:false
+    },
+    mobile : {
+        type:Number
+    },
+    uid : {
+        type:String,
     },
     email:{
         type:String,
@@ -15,10 +28,36 @@ const emailSchema = new mongoose.Schema({
         ],
         required:true
     },
-    golf:{
+    address : {
+        type:String
+    },
+    city : {
+        type:String
+    },
+    name :{
+        type:String
+    },
+    otp : {
+        type:String
+    },
+    otpExpires :{
+        type:String
+    },
+    hash : {
+        type:String
+    },
+    salt : {
+        type:String
+    },
+    isGolfie: {
         type:Boolean,
         default:false
-    }
+    },
+    isSubed : {
+        type:Boolean,
+        default:false
+    },
+    subscription : mongoose.Schema.ObjectId
 
 })
-module.exports = mongoose.model('Email',emailSchema);
+module.exports = mongoose.model('User',emailSchema);
