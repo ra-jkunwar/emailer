@@ -18,7 +18,7 @@ exports.sender=(user,password,sendingList,file,path,subject,content)=>{
         bcc:sendingList,
         subject: subject,
     html:
-    `<h1>${content}<br><br>Sent through Emailer</h1><p>Testing is done</p><br><img src="cid:uniq-mailInline" alt="inline_image"/>`,
+    `${content}<br><br><img src="cid:uniq-mailInline" alt="inline_image"/>`,
     attachments: [
             {
                 filename: file.name,

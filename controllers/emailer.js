@@ -7,7 +7,7 @@ const {
 const path = require('path');
 const csv = require('csv-parser')
 const fs = require('fs');
-
+const md5 = require("md5")
 const { model } = require('mongoose');
 
 
@@ -55,8 +55,9 @@ exports.createUserEmail = asyncHandler (async (req,res,next)=>{
         .on('end', () => {
           results.forEach(function(item){ 
             const newFile = new emailer({
-              golf:item.golf,
-              email:item.email
+             isGolfie:item.golf,
+              email:item.email,
+              uid: md5(item.email)
              
             })
             newFile.save()
@@ -79,9 +80,9 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
      if(req.body.type.startsWith("A")){
       emailList = await emailer.find()
      }else if(req.body.type.startsWith("O")){
-        emailList = await emailer.find({golf:true})
+        emailList = await emailer.find({isGolfie:true})
      }else{
-         emailList = await emailer.find({golf:false})
+         emailList = await emailer.find({isGolfie:false})
      }
      const fil = req.files.fileimg;
      emailcount=emailList.length
@@ -108,14 +109,16 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
           
         var paths = `./public/uploads/${fil.name}`;
         let a,b,c;
-       
+        let yu = req.body.post
+       const content = yu.replace(/\r/g, '\n')
         if(emailcount<=500){
       emailList.forEach(function(x){
        emailArray.push(x.email);
       })
-    
-      a = await sender(process.env.USER,process.env.PASS,emailArray,fil,paths,req.body.subject,req.body.post);
-        }else{
+    console.log(content);
+    a = await sender(process.env.USER,process.env.PASS,emailArray,fil,paths,req.body.subject,content);
+   
+}else{
             let newArray=[];
             let secondArray=[];
             emailArray = emailList.slice(0,500);
@@ -126,13 +129,15 @@ exports.sendEmail = asyncHandler (async (req,res,next)=>{
             maxArray.forEach(function(x){
                 secondArray.push(x.email);
                })
+
+               
             //    console.log("else m hu")
-           b = await sender(process.env.USER,process.env.PASS,newArray,fil,paths,req.body.subject,req.body.post);
-              c = await sender(process.env.USER2,process.env.PASME,newArray,fil,paths,req.body.subject,req.body.post);
+        //    b = await sender(process.env.USER,process.env.PASS,newArray,fil,paths,req.body.subject,req.body.post);
+            //   c = await sender(process.env.USER2,process.env.PASME,newArray,fil,paths,req.body.subject,req.body.post);
 
         }
         if(a||b||c){
-            await emailer.deleteMany();
+           await emailer.deleteMany();
             res.render("thank");
         }
                 
